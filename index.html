@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Desempenho em Simulados</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f5f5f4;--card:#fff;--ink:#1c1917;--mute:#78716c;--line:#e7e5e4;--field:#fafaf9;--btn:#1c1917;--btnink:#fff;--danger:#b91c1c;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141414;--card:#1e1e1e;--ink:#f5f5f4;--mute:#a8a29e;--line:#323232;--field:#171717;--btn:#f5f5f4;--btnink:#141414;--danger:#f87171;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141414;--card:#1e1e1e;--ink:#f5f5f4;--mute:#a8a29e;--line:#323232;--field:#171717;--btn:#f5f5f4;--btnink:#141414;--danger:#f87171;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:18px;letter-spacing:.08em;margin:0 0 16px;font-weight:700}
+h2{font-size:13px;letter-spacing:.08em;margin:0 0 12px;color:var(--mute);font-weight:600}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{background:none;border:0;border-bottom:2px solid transparent;color:var(--mute);font:inherit;font-size:13px;font-weight:600;letter-spacing:.06em;padding:10px 12px;cursor:pointer;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--ink)}
+.btn{background:var(--btn);color:var(--btnink);border:0;border-radius:8px;padding:11px 16px;font:inherit;font-size:13px;font-weight:700;letter-spacing:.05em;cursor:pointer}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--danger);color:#fff}
+.btn.add{width:100%;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px}
+.title{text-transform:uppercase;font-size:14px;letter-spacing:.03em;overflow-wrap:anywhere}
+.title span{color:var(--mute)}
+.icon{flex:none;background:none;border:0;color:var(--mute);padding:6px;border-radius:8px;cursor:pointer;display:grid;place-items:center}
+.icon:hover{color:var(--ink);background:var(--field)}
+.body{padding:0 16px 16px;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;margin:12px 0 16px}
+th{font-size:11px;letter-spacing:.07em;color:var(--mute);font-weight:600;padding:6px 4px}
+th[scope="row"]{text-align:left;color:var(--ink);font-size:13px;padding-left:0}
+thead th:first-child{width:38%}
+td{padding:4px}
+input,select{width:100%;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font:inherit;text-align:center}
+input:focus,select:focus{outline:2px solid var(--ink);outline-offset:-1px}
+.sum{border-top:1px solid var(--line);padding-top:14px;display:grid;gap:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;letter-spacing:.07em;color:var(--mute);font-weight:600}
+.row select{width:110px}
+.row strong{color:var(--ink);font-size:20px;letter-spacing:0}
+.row strong.big{font-size:28px}
+.row strong.mid{font-size:17px}
+.del{margin-top:14px;background:none;border:0;color:var(--mute);font:inherit;font-size:12px;cursor:pointer;padding:4px 0;text-decoration:underline}
+.del:hover{color:var(--danger)}
+.empty{color:var(--mute);text-align:center;padding:28px 12px;border:1px dashed var(--line);border-radius:12px;margin:0}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px}
+.cwrap{position:relative;height:340px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px;z-index:10}
+.modal{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;width:100%;max-width:380px}
+.modal label{display:block;font-size:11px;letter-spacing:.07em;color:var(--mute);font-weight:600;margin:12px 0 6px}
+.modal input{text-align:left}
+.modal .acts{display:flex;gap:8px;margin-top:18px}
+.modal .acts .btn{flex:1}
+.err{color:var(--danger);font-size:12px;min-height:16px;margin:8px 0 0}
+@media(max-width:520px){.cwrap{height:300px}.wrap{padding-top:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>DESEMPENHO EM SIMULADOS</h1>
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t1" aria-selected="true">SIMULADOS</button>
+    <button class="tab" role="tab" id="t2" aria-selected="false">CURVA DE DESEMPENHO</button>
+  </div>
+
+  <section id="v1">
+    <button class="btn add" id="add">+ ADICIONAR SIMULADO</button>
+    <div id="list"></div>
+  </section>
+
+  <section id="v2" hidden>
+    <div class="panel">
+      <h2>EVOLUÇÃO DO TRI GERAL</h2>
+      <div class="cwrap" id="w1"><canvas id="c1"></canvas></div>
+      <p class="empty" id="m1" hidden></p>
+    </div>
+    <div class="panel">
+      <h2>EVOLUÇÃO DOS ACERTOS TOTAIS</h2>
+      <div class="cwrap" id="w2"><canvas id="c2"></canvas></div>
+      <p class="empty" id="m2" hidden></p>
+    </div>
+  </section>
+</div>
+
+<div class="ov" id="ovNew" hidden>
+  <form class="modal" id="f" novalidate>
+    <h2 style="margin:0">NOVO SIMULADO</h2>
+    <label for="fn">NOME</label>
+    <input id="fn" maxlength="60" autocomplete="off" placeholder="Ex.: Simulado Poliedro">
+    <label for="fa">APLICAÇÃO</label>
+    <input id="fa" maxlength="40" autocomplete="off" placeholder="Ex.: ENEM Regular, PPL, Digital">
+    <p class="err" id="ferr"></p>
+    <div class="acts">
+      <button type="button" class="btn ghost" id="fc">CANCELAR</button>
+      <button type="submit" class="btn">CRIAR</button>
+    </div>
+  </form>
+</div>
+
+<div class="ov" id="ovDel" hidden>
+  <div class="modal">
+    <h2 style="margin:0">EXCLUIR SIMULADO</h2>
+    <p id="delTxt" style="margin:12px 0 0"></p>
+    <div class="acts">
+      <button class="btn ghost" id="dc">CANCELAR</button>
+      <button class="btn danger" id="dok">EXCLUIR</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const KEY='simulados-v1';
+const AREAS=[['lin','LINGUAGENS'],['hum','HUMANAS'],['nat','NATUREZA'],['mat','MATEMÁTICA']];
+const REDS=[920,940,960,980];
+const EYE='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.1 10.1 0 0 1 12 19C5.6 19 2 12 2 12a18 18 0 0 1 5.1-5.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18 18 0 0 1-2.2 3.2M1 1l22 22"/><path d="M14.1 14.1a3 3 0 1 1-4.2-4.2"/></svg>';
+
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY));if(Array.isArray(r))return r.filter(s=>s&&s.id&&s.a&&s.t)}catch(e){}
+  return [];
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(sims))}catch(e){}}
+
+let sims=load();               // ordem de criação (mais antigo primeiro)
+let open=new Set(sims.length?[sims[sims.length-1].id]:[]);
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf2=n=>n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nfIn=n=>n.toLocaleString('pt-BR',{useGrouping:false,maximumFractionDigits:2});
+const find=id=>sims.find(s=>s.id===id);
+
+/* ---------- cálculos ---------- */
+const vals=o=>AREAS.map(([k])=>o[k]).filter(v=>v!=null);
+const sum=o=>{const v=vals(o);return v.length?v.reduce((a,b)=>a+b,0):null};
+const mediaTri=s=>{const v=vals(s.t);return v.length?sum(s.t)/v.length:null};
+const media=(s,r)=>{const v=vals(s.t);return v.length?(sum(s.t)+r)/(v.length+1):null};
+const total=s=>sum(s.a);
+
+/* ---------- lista de simulados ---------- */
+function card(s){
+  const d=document.createElement('article');
+  d.className='card';d.dataset.id=s.id;
+  const o=open.has(s.id);
+  let h=`<div class="head"><div class="title"><b>${esc(s.nome)}</b> <span>| ${esc(s.aplicacao)}</span></div>
+    <button class="icon" data-act="toggle" aria-expanded="${o}" aria-label="${o?'Ocultar':'Mostrar'} informações">${o?EYE_OFF:EYE}</button></div>`;
+  if(o){
+    h+=`<div class="body"><table><thead><tr><th></th><th>ACERTOS</th><th>NOTA TRI</th></tr></thead><tbody>`;
+    AREAS.forEach(([k,n])=>{
+      const a=s.a[k],t=s.t[k];
+      h+=`<tr><th scope="row">${n}</th>
+      <td><input data-k="a" data-a="${k}" inputmode="numeric" placeholder="0–45" aria-label="Acertos em ${n}" value="${a==null?'':a}"></td>
+      <td><input data-k="t" data-a="${k}" inputmode="decimal" placeholder="0–1000" aria-label="Nota TRI em ${n}" value="${t==null?'':nfIn(t)}"></td></tr>`;
+    });
+    h+=`</tbody></table><div class="sum">
+      <div class="row"><span>MÉDIA GERAL POR NOTA DE REDAÇÃO</span></div>
+      ${REDS.map(r=>`<div class="row"><span>REDAÇÃO ${r}</span><strong class="mid" data-r="${r}"></strong></div>`).join('')}
+      <div class="row"><span>ACERTOS TOTAIS</span><strong class="big" data-out="total"></strong></div>
+    </div><button class="del" data-act="del">Excluir simulado</button></div>`;
+  }
+  d.innerHTML=h;
+  if(o)refresh(d,s);
+  return d;
+}
+function refresh(d,s){
+  const t=total(s);
+  REDS.forEach(r=>{const m=media(s,r);d.querySelector('[data-r="'+r+'"]').textContent=m==null?'—':nf2(m)});
+  
+  d.querySelector('[data-out="total"]').textContent=t==null?'—':t;
+}
+function renderList(){
+  const el=$('list');el.innerHTML='';
+  if(!sims.length){el.innerHTML='<p class="empty">Nenhum simulado cadastrado ainda.<br>Clique em + ADICIONAR SIMULADO para começar.</p>';return}
+  [...sims].reverse().forEach(s=>el.appendChild(card(s)));
+}
+
+$('list').addEventListener('input',e=>{
+  const i=e.target;if(i.tagName!=='INPUT')return;
+  const d=i.closest('.card'),s=find(d.dataset.id),k=i.dataset.k,ar=i.dataset.a;
+  let v=i.value;
+  if(k==='a'){
+    v=v.replace(/\D/g,'').slice(0,2);if(+v>45)v='45';
+  }else{
+    v=v.replace(/\./g,',').replace(/[^\d,]/g,'');
+    const p=v.split(',');
+    v=p[0].slice(0,4)+(p.length>1?','+p.slice(1).join('').slice(0,2):'');
+    if(parseFloat(v.replace(',','.'))>1000)v='1000';
+  }
+  i.value=v;
+  const n=(v===''||v===',')?null:(k==='a'?+v:parseFloat(v.replace(',','.')));
+  s[k][ar]=n;save();refresh(d,s);
+});
+$('list').addEventListener('focusout',e=>{
+  const i=e.target;if(i.tagName!=='INPUT'||!i.value)return;
+  const n=parseFloat(i.value.replace(',','.'));
+  i.value=isNaN(n)?'':(i.dataset.k==='a'?String(n):nfIn(n));
+});
+$('list').addEventListener('change',e=>{
+  const i=e.target;if(i.tagName!=='SELECT')return;
+  const d=i.closest('.card'),s=find(d.dataset.id);
+  s.red=i.value===''?null:+i.value;save();refresh(d,s);
+});
+let delId=null;
+$('list').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const s=find(b.closest('.card').dataset.id);
+  if(b.dataset.act==='toggle'){open.has(s.id)?open.delete(s.id):open.add(s.id);renderList()}
+  else{delId=s.id;$('delTxt').textContent='Excluir "'+s.nome+'"? Esta ação não pode ser desfeita.';$('ovDel').hidden=false}
+});
+$('dc').onclick=()=>{$('ovDel').hidden=true;delId=null};
+$('dok').onclick=()=>{
+  sims=sims.filter(s=>s.id!==delId);open.delete(delId);delId=null;
+  save();$('ovDel').hidden=true;renderList();
+};
+
+/* ---------- novo simulado ---------- */
+$('add').onclick=()=>{$('fn').value='';$('fa').value='';$('ferr').textContent='';$('ovNew').hidden=false;$('fn').focus()};
+$('fc').onclick=()=>{$('ovNew').hidden=true};
+$('f').addEventListener('submit',e=>{
+  e.preventDefault();
+  const nome=$('fn').value.trim(),ap=$('fa').value.trim();
+  if(!nome||!ap){$('ferr').textContent='Preencha o nome e a aplicação.';return}
+  const s={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),nome,aplicacao:ap,criado:Date.now(),a:{lin:null,hum:null,nat:null,mat:null},t:{lin:null,hum:null,nat:null,mat:null},red:null};
+  sims.push(s);open=new Set([s.id]);save();
+  $('ovNew').hidden=true;renderList();
+});
+
+/* ---------- abas ---------- */
+function tab(n){
+  $('t1').setAttribute('aria-selected',n===1);$('t2').setAttribute('aria-selected',n===2);
+  $('v1').hidden=n!==1;$('v2').hidden=n!==2;
+  if(n===2)renderCharts();
+}
+$('t1').onclick=()=>tab(1);$('t2').onclick=()=>tab(2);
+
+/* ---------- gráficos ---------- */
+const charts={},hid={tri:{},ac:{}};
+function css(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()}
+function build(key,cv,wrap,msg,defs,ytitle,dec){
+  if(charts[key]){charts[key].destroy();delete charts[key]}
+  const valid=sims.filter(s=>defs.some(d=>d.f(s)!=null)).length>=2;
+  $(wrap).hidden=!valid;$(msg).hidden=valid;
+  if(!valid){$(msg).textContent=sims.length?'Preencha os resultados de pelo menos dois simulados para ver a evolução.':'Cadastre pelo menos dois simulados e preencha seus resultados para ver a evolução.';return}
+  if(typeof Chart==='undefined'){$(wrap).hidden=true;$(msg).hidden=false;$(msg).textContent='Não foi possível carregar a biblioteca de gráficos. Verifique sua conexão.';return}
+  const mute=css('--mute'),line=css('--line'),ink=css('--ink');
+  Chart.defaults.font.family=getComputedStyle(document.body).fontFamily;
+  charts[key]=new Chart($(cv),{
+    type:'line',
+    data:{labels:sims.map(s=>s.nome),datasets:defs.map(d=>({
+      label:d.l,data:sims.map(s=>d.f(s)),borderColor:d.c==='ink'?ink:d.c,backgroundColor:d.c==='ink'?ink:d.c,
+      borderWidth:d.w||2,pointRadius:4,pointHoverRadius:7,tension:.25,spanGaps:true,borderDash:d.dash||[],hidden:hid[key][d.l]===undefined?!!d.h:hid[key][d.l]}))},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'nearest',intersect:false},
+      scales:{
+        x:{grid:{display:false},ticks:{color:mute,maxRotation:40,callback:function(v){const t=this.getLabelForValue(v);return t.length>14?t.slice(0,13)+'…':t}}},
+        y:{grid:{color:line},ticks:{color:mute},title:{display:true,text:ytitle,color:mute},beginAtZero:key==='ac'}
+      },
+      plugins:{
+        legend:{position:'bottom',labels:{color:mute,usePointStyle:true,boxWidth:8,padding:14},
+          onClick:(e,it,lg)=>{Chart.defaults.plugins.legend.onClick(e,it,lg);hid[key][it.text]=!lg.chart.isDatasetVisible(it.datasetIndex)}},
+        tooltip:{callbacks:{
+          title:i=>{const s=sims[i[0].dataIndex];return s.nome+' | '+s.aplicacao},
+          label:c=>c.dataset.label+': '+(dec?nf2(c.parsed.y):c.parsed.y)}}
+      }
+    }
+  });
+}
+function renderCharts(){
+  build('tri','c1','w1','m1',[
+    {l:'TRI geral',c:'ink',w:3,f:mediaTri},
+    {l:'Linguagens',c:'#3b82f6',h:1,f:s=>s.t.lin},
+    {l:'Ciências Humanas',c:'#f59e0b',h:1,f:s=>s.t.hum},
+    {l:'Ciências da Natureza',c:'#10b981',h:1,f:s=>s.t.nat},
+    {l:'Matemática',c:'#ef4444',h:1,f:s=>s.t.mat}
+    
+  ],'Nota TRI',true);
+  build('ac','c2','w2','m2',[
+    {l:'Acertos totais',c:'ink',w:3,f:total},
+    {l:'Linguagens',c:'#3b82f6',h:1,f:s=>s.a.lin},
+    {l:'Ciências Humanas',c:'#f59e0b',h:1,f:s=>s.a.hum},
+    {l:'Ciências da Natureza',c:'#10b981',h:1,f:s=>s.a.nat},
+    {l:'Matemática',c:'#ef4444',h:1,f:s=>s.a.mat}
+  ],'Acertos',false);
+}
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!$('v2').hidden)renderCharts()})}catch(e){}
+
+renderList();
+})();
+</script>
+</body>
+</html>
